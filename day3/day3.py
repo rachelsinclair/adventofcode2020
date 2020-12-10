@@ -1,8 +1,6 @@
+import math
+# requires Python 3.8+ for prod method
 #%% part 1
-import functools
-import operator
-
-prod = functools.partial(functools.reduce, operator.mul)
 line_count = 0
 with open('input.txt') as input_file:
     map = input_file.read().splitlines()
@@ -36,5 +34,5 @@ for velocity in velocities:
     trees.append(tree_count)
     print(f"Tree count for velocity {velocity} is {tree_count}")
 print(f"Tree list: {trees}")
-print(f"Product of all tree counts is {prod(trees)}")
+print(f"Product of all tree counts is {math.prod(trees)}")
 # %%
