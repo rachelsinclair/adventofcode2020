@@ -9,17 +9,23 @@ class BoardingPass:
             raise ValueError("Value not in correct format")
 
     def get_row(self):
-        row_indicator = self.value[:7].replace("F","0").replace("B","1")
-        row_number = int(row_indicator,2)
-        return row_number
+        return get_number_from_binary_string(self.value[:7],"B","F")
 
     def get_column(self):
-        column_indicator = self.value[7:].replace("L","0").replace("R","1")
-        column_number = int(column_indicator,2)
-        return column_number
+        return get_number_from_binary_string(self.value[7:],"R","L")
 
     def get_seat_id(self):
         return self.get_row() * 8 + self.get_column()
+
+def get_number_from_binary_string(str, ones, zeros):
+    """ Takes a string that is an encoded binary number and returns the number in base 10.
+
+    Keyword arguments:
+    str -- The string to decode
+    ones -- The character representing 1
+    zeros -- The character representing 0
+    """
+    return int(str.replace(ones,"1").replace(zeros,"0"),2)
 
 class TestBoardingPassMethods(unittest.TestCase):
 
@@ -45,6 +51,11 @@ class TestBoardingPassMethods(unittest.TestCase):
         self.assertEqual(BoardingPass("BFFFBBFRRR").get_seat_id(), 567)
         self.assertEqual(BoardingPass("FFFBBBFRRR").get_seat_id(), 119)
         self.assertEqual(BoardingPass("BBFFBBFRLL").get_seat_id(), 820)
+
+class TestOtherMethods(unittest.TestCase):
+    def test_get_number_from_binary_string(self):
+        self.assertEqual(get_number_from_binary_string("F","B","F"), 0)
+        self.assertEqual(get_number_from_binary_string("B","B","F"), 1)
 
 if __name__ == '__main__':
     unittest.main()
