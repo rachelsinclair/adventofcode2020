@@ -1,6 +1,6 @@
 import unittest
 
-def is_sum_of_two_elements_in_list(number_list, number):
+def is_sum_of_two_elements_in_list(number_list: list, number: int):
     # oh look, some code lifted from day 1!
     sorted_list = sorted(number_list)
     left_pointer,right_pointer = [0,len(sorted_list)-1]
@@ -15,22 +15,44 @@ def is_sum_of_two_elements_in_list(number_list, number):
             right_pointer -= 1
     return False
 
-def is_valid_next_number_in_sequence(sequence, preamble_length, number_to_test):
+def is_valid_next_number_in_sequence(sequence: list, preamble_length: int, number_to_test: int):
     return is_sum_of_two_elements_in_list(sequence[-preamble_length:], number_to_test)
 
-def get_first_invalid_number_in_sequence(sequence, preamble_length):
+def get_first_invalid_number_in_sequence(sequence: list, preamble_length: int):
     sequence_without_preamble = sequence[preamble_length:]
     return next((number for (index, number) in enumerate(sequence_without_preamble) if not is_valid_next_number_in_sequence(sequence[index:index+preamble_length],preamble_length,number)), None)
 
-def part_1():
+def get_puzzle_input():
     with open('input.txt') as input_file:
-        puzzle_input = [int(line) for line in input_file.read().splitlines()]
+        return [int(line) for line in input_file.read().splitlines()]
 
+def part_1(puzzle_input: list,preamble_length: int):
+    puzzle_input = get_puzzle_input()
     xmas_preamble = 25
-    answer = get_first_invalid_number_in_sequence(puzzle_input, xmas_preamble)
-    print(f"Solution to part 1: {answer}")
+    return get_first_invalid_number_in_sequence(puzzle_input, xmas_preamble)
 
-part_1()
+def get_contiguous_set_that_sums_to_given_total(number_list: list, total: int):
+    for start_index in range(0,len(number_list)):
+        for end_index in range(1,len(number_list)+1):
+            subset = number_list[start_index:end_index]
+            sum_of_subset = sum(subset)
+            if sum_of_subset == total:
+                return subset
+            elif sum_of_subset > total:
+                break
+    return None
+
+def part_2(puzzle_input: list, target: int):
+    list_summing_to_target = get_contiguous_set_that_sums_to_given_total(PUZZLE_INPUT, target)
+    return min(list_summing_to_target) + max(list_summing_to_target)
+
+PUZZLE_INPUT = get_puzzle_input()
+PREAMBLE_LENGTH = 25
+
+part_1_solution = part_1(PUZZLE_INPUT, PREAMBLE_LENGTH)
+print(f"Solution to part 1: {part_1_solution}")
+part_2_solution = part_2(PUZZLE_INPUT, part_1_solution)
+print(f"Solution to part 2: {part_2_solution}")
 
 class TestIsSumOfTwoElementsInListMethod(unittest.TestCase):
 
@@ -58,6 +80,23 @@ class TestGetFirstInvalidNumberInSequence(unittest.TestCase):
 
     def test_when_all_numbers_in_sequence_are_valid_none_is_returned(self):
         self.assertEqual(get_first_invalid_number_in_sequence([35, 20, 15, 25, 47, 40, 62, 55, 65], 5), None)
+    
+class TestGetContiguousSetThatSumsToGivenTotal(unittest.TestCase):
+
+    def test_return_none_if_no_valid_result(self):
+        self.assertEqual(get_contiguous_set_that_sums_to_given_total([1, 2, 3], 10), None)
+    
+    def test_return_whole_list_if_it_sums_to_total(self):
+        self.assertEqual(get_contiguous_set_that_sums_to_given_total([1, 2, 3], 6), [1, 2, 3])
+
+    def test_return_correct_result_for_subset_at_start_of_list(self):
+        self.assertEqual(get_contiguous_set_that_sums_to_given_total([1, 2, 3, 4], 3), [1, 2])
+    
+    def test_return_correct_result_for_subset_in_middle_of_list(self):
+        self.assertEqual(get_contiguous_set_that_sums_to_given_total([1, 2, 3, 4], 5), [2, 3])
+
+    def test_return_correct_result_for_subset_at_end_of_list(self):
+        self.assertEqual(get_contiguous_set_that_sums_to_given_total([1, 2, 3, 4], 7), [3, 4])
 
 if __name__ == "__main__":
     unittest.main()
